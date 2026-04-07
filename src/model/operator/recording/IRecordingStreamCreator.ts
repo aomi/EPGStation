@@ -8,8 +8,4 @@ interface IRecordingStreamCreator {
     changeEndAt(reserve: Reserve): void;
 }
 
-namespace IRecordingStreamCreator {
-    export const PREP_TIME = 15 * 1000;
-}
-
 export default IRecordingStreamCreator;

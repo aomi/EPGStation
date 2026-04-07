@@ -95,6 +95,11 @@ export default interface IConfigFile {
     conflictPriority: number;
     streamingPriority: number;
 
+    // 録画準備設定
+    recordingPrepTimeMs: number;
+    recordingPrepRetryCount: number;
+    recordingPrepRetryIntervalMs: number;
+
     // 時刻指定予約マージン
     timeSpecifiedStartMargin: number;
     timeSpecifiedEndMargin: number;

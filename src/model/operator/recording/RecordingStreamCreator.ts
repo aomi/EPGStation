@@ -176,7 +176,7 @@ export default class RecordingStreamCreator implements IRecordingStreamCreator {
             if (this.tuners[i].types.indexOf(<any>reserve.channelType) !== -1) {
                 let isOk = true;
                 for (const p of this.tuners[i].programs) {
-                    if (p.reserve.allowEndLack === false || p.reserve.endAt - now > IRecordingStreamCreator.PREP_TIME) {
+                    if (p.reserve.allowEndLack === false || p.reserve.endAt - now > this.config.recordingPrepTimeMs) {
                         isOk = false;
                         break;
                     }
@@ -197,7 +197,7 @@ export default class RecordingStreamCreator implements IRecordingStreamCreator {
 
                     try {
                         const newProgram = await mirakurun.getProgram(p.reserve.programId);
-                        if (newProgram.startAt + newProgram.duration - now > IRecordingStreamCreator.PREP_TIME) {
+                        if (newProgram.startAt + newProgram.duration - now > this.config.recordingPrepTimeMs) {
                             // 延長があった
                             isOk = false;
                             break;

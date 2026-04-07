@@ -71,6 +71,13 @@ class RecorderModel implements IRecorderModel {
     // イベントリレータイマー
     private eventRelayTimerId: NodeJS.Timeout | null = null;
 
+    private get prepWaitTimeoutMs(): number {
+        return Math.max(
+            this.config.recordingPrepTimeMs,
+            this.config.recordingPrepRetryIntervalMs * (this.config.recordingPrepRetryCount + 1),
+        );
+    }
+
     constructor(
         @inject('ILoggerModel') logger: ILoggerModel,
         @inject('IConfiguration') configuration: IConfiguration,
@@ -122,7 +129,7 @@ class RecorderModel implements IRecorderModel {
         }
 
         // 待機時間を計算
-        let time = this.reserve.startAt - now - IRecordingStreamCreator.PREP_TIME;
+        let time = this.reserve.startAt - now - this.config.recordingPrepTimeMs;
         if (time < 0) {
             time = 0;
         }
@@ -203,11 +210,11 @@ class RecorderModel implements IRecorderModel {
 
             this.log.system.error(`preprec failed: ${this.reserve.id}`);
             this.log.system.error(err);
-            if (retry < 3) {
+            if (retry < this.config.recordingPrepRetryCount) {
                 // retry
                 setTimeout(() => {
                     this.prepRecord(retry + 1);
-                }, 1000 * 5);
+                }, this.config.recordingPrepRetryIntervalMs);
             } else {
                 this.isPrepRecording = false;
                 // 録画準備失敗を通知
@@ -855,7 +862,7 @@ class RecorderModel implements IRecorderModel {
                                 // タイムアウト設定
                                 const timeoutId = setTimeout(() => {
                                     reject(new Error('ChangeEndAtTimeoutError'));
-                                }, IRecordingStreamCreator.PREP_TIME);
+                                }, this.prepWaitTimeoutMs);
 
                                 // 録画開始内部イベント発行街
                                 this.eventEmitter.once(RecorderModel.START_RECORDING_EVENT, () => {
