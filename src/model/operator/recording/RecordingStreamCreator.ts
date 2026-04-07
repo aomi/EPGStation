@@ -240,22 +240,22 @@ export default class RecordingStreamCreator implements IRecordingStreamCreator {
         const mirakurun = this.mirakurunClientModel.getClient();
         mirakurun.priority = reserve.isConflict ? this.config.conflictPriority : this.config.recPriority;
 
-        if (reserve.programId === null) {
-            // 時刻指定予約
-            return this.getTimeSpecifiedStream(reserve, mirakurun, abortSignal);
-        } else {
-            // programId 指定予約
-            return mirakurun.getProgramStream({ id: reserve.programId, decode: true, signal: abortSignal });
+        if (reserve.programId === null || this.config.recordingUseServiceStream) {
+            // 時刻指定予約 or service stream での録画
+            return this.getServiceStream(reserve, mirakurun, abortSignal);
         }
+
+        // programId 指定予約
+        return mirakurun.getProgramStream({ id: reserve.programId, decode: true, signal: abortSignal });
     }
 
     /**
-     * 時刻指定予約の stream を返す
+     * service stream を返す
      * @param reserve: Reserve
      * @param mirakurun: Mirakurun
      * @return Promise<http.IncomingMessage>
      */
-    private async getTimeSpecifiedStream(
+    private async getServiceStream(
         reserve: Reserve,
         mirakurun: Mirakurun,
         abortSignal?: AbortSignal,
@@ -329,7 +329,10 @@ export default class RecordingStreamCreator implements IRecordingStreamCreator {
      * @param reserve
      */
     public changeEndAt(reserve: Reserve): void {
-        if (reserve.programId !== null || typeof this.timerIndex[reserve.id] === 'undefined') {
+        if (
+            (reserve.programId !== null && this.config.recordingUseServiceStream === false) ||
+            typeof this.timerIndex[reserve.id] === 'undefined'
+        ) {
             throw new Error('StreamChangeAtError');
         }
 

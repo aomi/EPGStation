@@ -99,6 +99,7 @@ export default interface IConfigFile {
     recordingPrepTimeMs: number;
     recordingPrepRetryCount: number;
     recordingPrepRetryIntervalMs: number;
+    recordingUseServiceStream: boolean;
 
     // 時刻指定予約マージン
     timeSpecifiedStartMargin: number;

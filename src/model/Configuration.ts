@@ -228,6 +228,7 @@ namespace Configuration {
         recordingPrepTimeMs: 15 * 1000,
         recordingPrepRetryCount: 3,
         recordingPrepRetryIntervalMs: 5 * 1000,
+        recordingUseServiceStream: false,
         timeSpecifiedStartMargin: 1,
         timeSpecifiedEndMargin: 1,
         recordedFormat: '%YEAR%年%MONTH%月%DAY%日%HOUR%時%MIN%分%SEC%秒-%TITLE%',
